@@ -1,0 +1,13 @@
+langchain
+langchain-core
+langchain-community
+langchain-openai
+langchain-huggingface
+openai
+transformers
+huggingface_hub
+python-dotenv
+duckdb
+duckdb-engine
+sqlalchemy
+streamlit==1.32.0
