@@ -1,5 +1,6 @@
 import streamlit as st
 import duckdb
+import re
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -29,9 +30,16 @@ def get_schema(*args, **kwargs):
     columns = "\n".join([f"{col} ({dtype})" for col, dtype in schema])
     return f""" Table: trips Columns:\n{columns}"""
 
+
+def clean_sql(query: str) -> str:
+    # Remove markdown code blocks like ```sql ... ```
+    query = re.sub(r"```sql|```", "", query, flags=re.IGNORECASE).strip()
+    return query
+
 def run_query(query):
-    # Execute the query and return a pandas DataFrame
-    return conn.execute(query).fetchdf()
+    cleaned_query = clean_sql(query)
+    print(f"\nRunning Query:\n{cleaned_query}\n")
+    return conn.execute(cleaned_query).fetchdf()
 
 def get_llm(load_from_hugging_face=False):
     if load_from_hugging_face:
@@ -92,7 +100,7 @@ def answer_user_query(query, llm):
 # --- Streamlit UI ---
 
 st.title("Operations Data Warehouse Assistant")
-st.markdown("Ask natural language questions to query the DuckDB trips database.")
+st.markdown("Ask natural language questions to query the datawarehouse to get updates on the app operations.")
 
 # UI Elements
 user_query = st.text_area("What would you like to know?", placeholder="e.g., Which day in January had the highest number of taxi trips?")
